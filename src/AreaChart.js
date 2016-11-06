@@ -17,6 +17,7 @@ export class AreaChart {
         this.chartColour = (options.chartColour) ? options.chartColour : 'lightblue'
         this.axisColour = (options.axisColour) ? options.axisColour : '#262626'
         this.responsive = (options.responsive !== undefined) ? options.responsive : true
+        // TODO: add option to start axes at zero, rather than data min extents
     }
 
     render() {
@@ -52,17 +53,13 @@ export class AreaChart {
 
     prepareXAxis() {
         this.xScale = d3.scaleLinear()
-            .domain([0, d3.max(this.data.values, d => d.distance)])
+            .domain(d3.extent(this.data.values, d => d.x))
             .range([0, this.width])
     }
 
     prepareYAxis() {
         this.yScale = d3.scaleLinear()
-            .domain([
-                //d3.min(this.data.values, d => d.elevation),
-                0,
-                d3.max(this.data.values, d => d.elevation)
-            ])
+            .domain(d3.extent(this.data.values, d => d.y))
             .range([this.height, 0])
     }
 
@@ -92,9 +89,9 @@ export class AreaChart {
 
     createAreaChart() {
         let area = d3.area()
-            .x(d => this.xScale(d.distance))
+            .x(d => this.xScale(d.x))
             .y0(this.yScale(this.yScale.domain()[0]))
-            .y1(d => this.yScale(d.elevation))
+            .y1(d => this.yScale(d.y))
             .curve(d3.curveCatmullRom.alpha(0.5))
 
         this.canvas

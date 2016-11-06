@@ -16418,6 +16418,7 @@ var AreaChart = exports.AreaChart = function () {
             this.chartColour = options.chartColour ? options.chartColour : 'lightblue';
             this.axisColour = options.axisColour ? options.axisColour : '#262626';
             this.responsive = options.responsive !== undefined ? options.responsive : true;
+            // TODO: add option to start axes at zero, rather than data min extents
         }
     }, {
         key: 'render',
@@ -16451,18 +16452,16 @@ var AreaChart = exports.AreaChart = function () {
     }, {
         key: 'prepareXAxis',
         value: function prepareXAxis() {
-            this.xScale = d3.scaleLinear().domain([0, d3.max(this.data.values, function (d) {
-                return d.distance;
-            })]).range([0, this.width]);
+            this.xScale = d3.scaleLinear().domain(d3.extent(this.data.values, function (d) {
+                return d.x;
+            })).range([0, this.width]);
         }
     }, {
         key: 'prepareYAxis',
         value: function prepareYAxis() {
-            this.yScale = d3.scaleLinear().domain([
-            //d3.min(this.data.values, d => d.elevation),
-            0, d3.max(this.data.values, function (d) {
-                return d.elevation;
-            })]).range([this.height, 0]);
+            this.yScale = d3.scaleLinear().domain(d3.extent(this.data.values, function (d) {
+                return d.y;
+            })).range([this.height, 0]);
         }
     }, {
         key: 'createAxes',
@@ -16491,9 +16490,9 @@ var AreaChart = exports.AreaChart = function () {
             var _this = this;
 
             var area = d3.area().x(function (d) {
-                return _this.xScale(d.distance);
+                return _this.xScale(d.x);
             }).y0(this.yScale(this.yScale.domain()[0])).y1(function (d) {
-                return _this.yScale(d.elevation);
+                return _this.yScale(d.y);
             }).curve(d3.curveCatmullRom.alpha(0.5));
 
             this.canvas.append('path').attr('class', 'area').attr('d', area(this.data.values)).style('fill', this.chartColour);
@@ -16503,25 +16502,33 @@ var AreaChart = exports.AreaChart = function () {
     return AreaChart;
 }();
 
-},{"./responsivefy":4,"d3":1}],3:[function(require,module,exports){
+},{"./responsivefy":5,"d3":1}],3:[function(require,module,exports){
 "use strict";
 
-var _AreaChart = require("./AreaChart.js");
-
-var data = {
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+var elevationData = exports.elevationData = {
     "distance": 50,
     "elevation": [59, 59, 59.1, 58.8, 58.7, 58.4, 58.2, 57.9, 57.8, 57.6, 57.4, 57.4, 57.5, 57.6, 58, 58.6, 59.3, 59.7, 59.5, 59.1, 59, 58.7, 58.7, 58.3, 58.1, 57.7, 57.4, 57.3, 57, 56.8, 56.7, 56.7, 56.8, 56.9, 57, 57.2, 57.5, 57.7, 58, 58, 58, 57.8, 57.7, 57.7, 57.5, 57.5, 57.2, 56.9, 56.9, 56.8, 56.8, 56.7, 56.6, 56.2, 55.8, 55.4, 55.1, 55, 55.1, 55.2, 55.2, 55.1, 55.1, 55.2, 55.2, 55.3, 55.3, 55.5, 55.7, 56, 56, 56, 56, 55.8, 55.4, 55.3, 55.3, 55, 54.6, 54.2, 53.8, 53.7, 53.3, 53, 52.7, 52.5, 52.4, 52.1, 52, 51.3, 50.3, 49.4, 48.7, 47.9, 47.6, 47.3, 47, 46.7, 46.5, 46.3, 46, 45.4, 44.7, 44.4, 44.1, 43.7, 43.5, 43.4, 43, 42.8, 42.7, 42.7, 42.7, 42.7, 42.6, 42.2, 41.9, 41.5, 41.1, 40.6, 40.2, 40, 39.9, 39.9, 39.9, 39.8, 39.7, 39.6, 39.3, 39.3, 39.4, 39.5, 39.5, 39.5, 39.2, 38.9, 38.7, 38.6, 38.4, 38, 37.8, 37.7, 37.6, 37.7, 37.8, 37.8, 38.2, 38.9, 39, 39.6, 39.9, 39.9, 39.9, 39.9, 39.6, 39.5, 39.1, 39.5, 39.7, 39.9, 40, 39.9, 39.8, 39.7, 39.5, 39.6, 40.1, 40.5, 41.1, 41.5, 41.8, 42.1, 42.3, 42.5, 42.6, 42.5, 42.3, 42.1, 42.1, 42.4, 42.5, 42.6, 42.6, 42.6, 42.6, 42.7, 42.9, 43, 43, 43, 43.1, 43.1, 43.5, 43.6, 43.9, 44, 44.4, 44.5, 44.8, 44.9, 45.2, 45.5, 45.8, 46, 46.3, 46.7, 46.7, 47, 47.6, 48.2, 48.3, 48.7, 48.7, 48.6, 48.3, 48, 47.6, 47.1, 46.8, 46.8, 46.7, 46.7, 46.4, 46.3, 45.7, 45.2, 45, 44.4, 44.3, 43.8, 43.7, 43.7, 43.7, 44, 44.2, 44.4, 44.5, 44.4, 44.4, 44.4, 44.4, 44.7, 44.7, 45, 45.3, 45.6, 45.7, 45.8, 46, 46.1, 46.1, 45.9, 45.4, 44.9, 44.4, 43.7, 43.4, 43.1, 43, 43, 43, 42.9, 42.2, 41.4, 41.3, 40.6, 40.2, 40, 39.8, 39.7, 39.8, 39.9, 39.8, 39.8, 39.4, 39.2, 39.5, 39.8, 39.9, 40, 39.9, 39.9, 39.7, 39.5, 39.7, 40.2, 40.4, 41, 41.2, 41.5, 41.8, 41.9, 42, 42.3, 42.5, 42.5, 42.4, 42.2, 42.1, 42, 42, 42.4, 42.4, 42.6, 42.6, 42.6, 42.8, 42.9, 43, 43, 43.1, 43.2, 43.5, 43.8, 44, 44.3, 44.4, 44.8, 44.8, 45, 45.3, 45.5, 45.7, 46, 46.3, 46.5, 46.7, 47.2, 47.6, 48.2, 48.7, 48.8, 48.5, 48.2, 48.2, 48, 47.7, 47.3, 46.9, 46.8, 46.7, 46.6, 46.5, 46.2, 45.6, 45, 44.6, 44.1, 43.7, 43.6, 43.5, 43.5, 43.9, 44.2, 44.2, 44.3, 44.3, 44.3, 44.3, 44.5, 44.5, 44.9, 45.1, 45.2, 45.6, 45.7, 45.8, 45.4, 45.1, 44.8, 44.1, 43.5, 43.2, 43, 42.9, 42.9, 43, 43, 42.2, 41.9, 41.2, 40.5, 40.1, 39.9, 39.7, 39.9, 39.9, 39.7, 39.3, 39.2, 39.5, 39.8, 40, 39.9, 39.8, 39.6, 39.4, 39.7, 40.1, 40.7, 41.2, 41.6, 41.9, 42.1, 42.3, 42.5, 42.6, 42.4, 42.3, 42.2, 42.1, 42.1, 42, 42, 42.2, 42.5, 42.6, 42.6, 42.7, 42.7, 42.8, 43, 43, 43, 43.1, 43.4, 43.7, 44.1, 44.2, 44.4, 44.7, 45, 45.1, 45.4, 45.7, 46, 46.3, 46.6, 46.9, 47.2, 47.7, 48.4, 48.7, 48.9, 48.7, 48.5, 48.2, 47.9, 47.9, 47.7, 47.3, 47, 46.8, 46.7, 46.6, 46.5, 46.1, 45.6, 45.4, 44.8, 44.4, 43.8, 43.7, 43.6, 43.4, 43.5, 43.7, 44, 44.1, 44.2, 44.2, 44.1, 44.1, 44.1, 44.4, 44.8, 44.8, 45, 45.1, 45.2, 45.4, 45.5, 45.4, 45, 44.6, 44.2, 43.7, 43.3, 43.1, 43, 43, 43, 43, 43, 43, 42.6, 41.9, 41, 40.9, 40.1, 39.8, 39.7, 39.4, 38.7, 38.3, 37.9, 37.6, 37.5, 37.4, 37.4, 37.4, 37.4, 37.5, 37.5, 37.9, 38.3, 38.4, 38.5, 38.7, 39, 39.1, 39.3, 39.3, 39.3, 39.3, 39.4, 39.7, 39.8, 39.9, 39.9, 40, 40.3, 40.6, 41, 41.2, 41.5, 41.9, 42.2, 42.6, 43, 43.2, 43.2, 43.2, 43.2, 43.5, 43.9, 44.1, 44.5, 44.9, 45.4, 46, 46.1, 46.8, 47.2, 47.3, 47.3, 47.5, 47.6, 47.8, 48, 48.3, 48.6, 48.8, 49.3, 49.8, 50.7, 51.3, 51.7, 51.9, 51.9, 52.4, 52.4, 52.7, 52.8, 53, 53.3, 53.8, 54.1, 54.5, 54.9, 55.1, 55.2, 55.2, 55.3, 55.6, 55.9, 56.1, 56.1, 56, 55.8, 55.5, 55.5, 55.3, 55.4, 55.5, 55.3, 55.3, 55.4, 55.5, 55.3, 55.3, 55.7, 56.1, 56.3, 56.5, 56.7, 56.8, 56.9, 57, 57.1, 57.3, 57.4, 57.8, 57.9, 58, 58, 58.1, 58.1, 58.1, 57.8, 57.8, 57.5, 57.2, 57.1, 56.8, 56.9, 57, 57.1, 57.3, 57.4, 57.7, 57.9, 58.1, 58.4, 58.7, 58.8, 59.1, 59.2, 59.3, 59.3, 58.9, 58.2, 58, 57.6, 57.5, 57.4, 57.4, 57.4, 57.7, 57.9, 57.9, 58, 58.1, 58.2, 58.5, 58.9, 59]
 };
 
+},{}],4:[function(require,module,exports){
+'use strict';
+
+var _AreaChart = require('./AreaChart.js');
+
+var _data = require('./data');
+
+// Convert data into array of objects - { values: [{ x, y }] }
 var refactorData = function refactorData(data) {
     var d = data.distance / data.elevation.length;
-    var newData = data.elevation.map(function (e, i) {
-        return { elevation: +e, distance: parseFloat(i * d, 10) };
-    });
-    return { values: newData };
+    return { values: data.elevation.map(function (e, i) {
+            return { x: i * d, y: e };
+        }) };
 };
 
-var areaChart = new _AreaChart.AreaChart(refactorData(data), {
+var areaChart = new _AreaChart.AreaChart(refactorData(_data.elevationData), {
     width: 800,
     height: 300,
     margin: { top: 10, right: 30, bottom: 30, left: 30 },
@@ -16530,7 +16537,7 @@ var areaChart = new _AreaChart.AreaChart(refactorData(data), {
 
 areaChart.render();
 
-},{"./AreaChart.js":2}],4:[function(require,module,exports){
+},{"./AreaChart.js":2,"./data":3}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -16565,4 +16572,4 @@ var responsivefy = exports.responsivefy = function responsivefy(svg) {
     }
 };
 
-},{"d3":1}]},{},[3]);
+},{"d3":1}]},{},[4]);

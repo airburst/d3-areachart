@@ -1,4 +1,4 @@
-{
+export const elevationData = {
     "distance": 50,
     "elevation": [
         59,
