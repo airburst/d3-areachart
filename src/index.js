@@ -6,7 +6,7 @@ const refactorData = (data) => {
     let d = data.distance / data.elevation.length
     return { values: data.elevation.map((e, i) => {
         return { x: i * d, y: e }
-    })}
+    }) }
 }
 
 const areaChart = new AreaChart(refactorData(elevationData), {
@@ -14,6 +14,8 @@ const areaChart = new AreaChart(refactorData(elevationData), {
     height: 300,
     margin : {top: 10, right: 30, bottom: 30, left: 30},
     chartColour: '#c8042b'
+    //,responsive: false
+    //,axisColour: black
 })
 
 areaChart.render()

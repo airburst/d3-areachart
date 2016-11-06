@@ -16533,6 +16533,8 @@ var areaChart = new _AreaChart.AreaChart(refactorData(_data.elevationData), {
     height: 300,
     margin: { top: 10, right: 30, bottom: 30, left: 30 },
     chartColour: '#c8042b'
+    //,responsive: false
+    //,axisColour: black
 });
 
 areaChart.render();
