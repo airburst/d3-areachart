@@ -671,6 +671,11 @@ const refactorData = (data) => {
     return { values: newData }
 }
 
-const areaChart = new AreaChart(refactorData(data))
+const areaChart = new AreaChart(refactorData(data), {
+    width: 800,
+    height: 300,
+    margin : {top: 10, right: 30, bottom: 30, left: 30},
+    chartColour: '#c8042b'
+})
 
 areaChart.render()
