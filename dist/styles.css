@@ -1,0 +1,8 @@
+.chart svg {
+    background-color: white;
+}
+
+.area {
+    fill: lightblue;
+    opacity: 0.8;
+}
