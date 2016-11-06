@@ -16404,20 +16404,22 @@ var AreaChart = exports.AreaChart = function () {
         _classCallCheck(this, AreaChart);
 
         this.data = data;
-        this.fullWidth = options.width ? options.width : 800;
-        this.fullHeight = options.height ? options.height : 400;
-        this.margin = options.margin ? options.margin : { top: 10, right: 0, bottom: 30, left: 30 };
-        this.width = this.fullWidth - this.margin.left - this.margin.right;
-        this.height = this.fullHeight - this.margin.top - this.margin.bottom;
-        this.chartColour = options.chartColour ? options.chartColour : 'lightblue';
-        this.axisColour = options.axisColour ? options.axisColour : '#262626';
-        this.responsive = options.responsive !== undefined ? options.responsive : true;
-        this.canvas = {};
-        this.xScale = {};
-        this.yScale = {};
+        this.handleOptions(options);
     }
 
     _createClass(AreaChart, [{
+        key: 'handleOptions',
+        value: function handleOptions(options) {
+            this.fullWidth = options.width ? options.width : 800;
+            this.fullHeight = options.height ? options.height : 400;
+            this.margin = options.margin ? options.margin : { top: 10, right: 0, bottom: 30, left: 30 };
+            this.width = this.fullWidth - this.margin.left - this.margin.right;
+            this.height = this.fullHeight - this.margin.top - this.margin.bottom;
+            this.chartColour = options.chartColour ? options.chartColour : 'lightblue';
+            this.axisColour = options.axisColour ? options.axisColour : '#262626';
+            this.responsive = options.responsive !== undefined ? options.responsive : true;
+        }
+    }, {
         key: 'render',
         value: function render() {
             this.canvas = this.createCanvas();

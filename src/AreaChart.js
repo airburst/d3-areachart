@@ -5,6 +5,10 @@ export class AreaChart {
 
     constructor(data, options) {
         this.data = data
+        this.handleOptions(options)
+    }
+
+    handleOptions(options) {
         this.fullWidth = (options.width) ? options.width : 800
         this.fullHeight = (options.height) ? options.height : 400
         this.margin = (options.margin) ? options.margin : {top: 10, right: 0, bottom: 30, left: 30}
@@ -13,9 +17,6 @@ export class AreaChart {
         this.chartColour = (options.chartColour) ? options.chartColour : 'lightblue'
         this.axisColour = (options.axisColour) ? options.axisColour : '#262626'
         this.responsive = (options.responsive !== undefined) ? options.responsive : true
-        this.canvas = {}
-        this.xScale = {}
-        this.yScale = {}
     }
 
     render() {
